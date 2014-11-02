@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "cheerio": "^0.17.0",
+    "mongodb": "^1.4.19",
+    "mongoose": "^3.8.18",
     "nightmare": "^1.5.1"
   },
   "devDependencies": {},
