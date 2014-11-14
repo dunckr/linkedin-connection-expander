@@ -33,11 +33,11 @@ describe('pymk', function() {
         }).should.throw('require password');
     });
 
-
-    it('should parse the url for the id', function() {
-        var url = 'https://www.linkedin.com/profile/view?id=012345678&amp;authType=name&amp;authToken=8o5N&amp;trk=connect_hub_pymk_profile_photo';
-        (pymk.parseUrl(url)).should.equal('012345678');
+    it('should setup default options', function() {
+        (pymk.email).should.equal('test@email.com');
+        (pymk.password).should.equal('topSecret');
+        (pymk.maxTimesToVisit).should.equal(2);
+        (pymk.timeBetweenVists).should.equal(604800);
     });
-
 
 });

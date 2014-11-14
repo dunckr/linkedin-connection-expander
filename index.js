@@ -1,105 +1,47 @@
 var Nightmare = require('nightmare'),
-    $ = require('cheerio'),
     db = require('./config/db'),
-    User = require('./models/user');
+    LinkedIn = require('./lib/linkedin');
 
-var login = exports.login = function(email, password) {
-    return function(nightmare) {
-        nightmare
-            .goto('https://www.linkedin.com/uas/login')
-            .type('#session_key-login', email)
-            .type('#session_password-login', password)
-            .click('#btn-primary')
-            .wait();
-    };
+exports = module.exports = Pymk;
+
+function Pymk(options) {
+    if (options === undefined) throw new Error('require login options');
+    if (options.email === undefined) throw new Error('require email');
+    if (options.password === undefined) throw new Error('require password');
+
+    this.email = options.email;
+    this.password = options.password;
+    this.maxTimesToVisit = options.maxTimesToVisit || 2;
+    this.timeBetweenVists = options.timeBetweenVists || 60 * 60 * 24 * 7;
+    this.numberOfPages = options.numberOfPages || 2;
+}
+
+Pymk.prototype.run = function() {
+    this.extractUsers();
+    this.visitRequiredUsers();
 };
 
-var showUsers = exports.showUsers = function() {
-    return function(nightmare) {
-        nightmare
-            .goto('https://www.linkedin.com/people/pymk')
-            .wait();
-    };
+Pymk.prototype.extractUsers = function() {
+    new Nightmare()
+        .use(LinkedIn.login(this.email, this.password))
+        .use(LinkedIn.initalListOfUsers())
+        .use(LinkedIn.nextPageOfUsers(this.numberOfPages))
+        .use(LinkedIn.extractListOfUsers())
+        .run();
 };
 
-var getNextUsers = exports.getNextUsers = function() {
-    return function(nightmare) {
-        nightmare
-            .evaluate(function() {
-                // Work around for infinite scroll
-                return $(window).scrollTop($(document).height());
-            })
-            .wait();
-    };
-};
-
-var listUsers = exports.listUsers = function() {
-    return function(nightmare) {
-        nightmare
-            .evaluate(function() {
-                return document.documentElement.innerHTML;
-            }, function(res) {
-                var $els = $(res).find('.entityblock');
-                $els.each(function(index, el) {
-                    extractUser($(el));
-                });
-            })
-            .wait();
-    };
-};
-
-var extractUser = function($el) {
-    var url = $el.find('.image').attr('href'),
-        id = parseId(url);
-    User.find({
-        id: id
-    }, function(err, obj) {
-
-        if (obj.length === 0) {
-            var user = new User({
-                id: id,
-                name: $el.find('.name').text(),
-                viewLink: $el.find('img'),
-                connectLink: $el.find('.bt-request-buffed')
-            });
-            user.save(function(err, obj) {
-                console.log(obj);
-            });
+Pymk.prototype.visitRequiredUsers = function() {
+    LinkedIn.getAllUsers(function(err, users) {
+        for (var i = 0; i < users.length; i++) {
+            var user = users[i];
+            this.visitUser(user.id);
         }
     });
 };
 
-var parseId = function(url) {
-    return url.match(/[?id]=([^&]*)/)[1];
-};
-
-var visit = exports.visit = function(url) {
-    return function(nightmare) {
-        nightmare
-            .goto(url)
-            .wait()
-            .back()
-            .wait();
-    };
-};
-
-module.exports = pymk = function(options) {
-    if (options.email === undefined) return 'require email';
-    if (options.password === undefined) return 'require password';
-
-    var maxTimesVisit = options.maxVisitTime || 2,
-        timeBetweenVists = options.timeBetweenVists || 60 * 60 * 24 * 7;
-
+Pymk.prototype.visitUser = function(id) {
+    var url = 'https://www.linkedin.com/profile/view?id=' + id;
     new Nightmare()
-        .use(login(options.email, options.password))
-        .screenshot('testloggedin.png')
-        .use(showUsers())
-        .use(getNextUsers())
-        .use(getNextUsers())
-        .use(getNextUsers())
-        .use(listUsers())
-        .screenshot('testlistingusers.png')
-        .run(function(err, nightmare) {
-            console.log(err);
-        });
+        .use(LinkedIn.visit(url))
+        .run();
 };

@@ -2,10 +2,12 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var userSchema = new Schema({
-    id: String,
+    id: {
+        type: String,
+        unique: true
+    },
     name: String,
     viewLink: String,
-    connectLink: String,
     timesVisited: Number,
     lastVisited: {
         type: Date,
