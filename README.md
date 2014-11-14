@@ -1,12 +1,12 @@
-# LinkedIn PYMK Connector
+# LinkedIn Connection Expander
 
-![pymk](https://raw.githubusercontent.com/dunckr/pymk/master/assets/pymk.png)
+![People You May Know](https://raw.githubusercontent.com/dunckr/pymk/master/assets/pymk.png)
 
 Unlike other social networks, connecting with others on LinkedIn is a positive gain.
 Most users will connect with you just by simply viewing their profile.
 This is a growth hack to expand your network by utilising this tendancy.
 
-LinkedIn suggests people that you might know.
+LinkedIn suggests people that you might know (PYMK).
 This script automates viewing these users’ profiles.
 
 Users are stored into [MongoDB](http://www.mongodb.org/) and it is driven by a headless browser, [PhantomJS](http://phantomjs.org/).
@@ -34,6 +34,8 @@ var options = {
 var pymk = new Pymk(options);
 pymk.run();
 ```
+
++ Combine with [node-cron](https://github.com/ncb000gt/node-cron) to have this run on a scheduled basis
 
 ## License
 
