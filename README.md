@@ -1,13 +1,13 @@
-# Linkedin PYMK Connector
+# LinkedIn PYMK Connector
 
 ![pymk](https://raw.githubusercontent.com/dunckr/pymk/master/assets/pymk.png)
 
-Unlike other social networks, connecting with others on Linkedin is a positive gain.
-Most users will connect with you just by simply viewing there profile.
+Unlike other social networks, connecting with others on LinkedIn is a positive gain.
+Most users will connect with you just by simply viewing their profile.
 This is a growth hack to expand your network by utilising this tendancy.
 
 LinkedIn suggests people that you might know.
-This script automates viewing these users’ profiles on scheduled batches and time frames.
+This script automates viewing these users’ profiles.
 
 Users are stored into [MongoDB](http://www.mongodb.org/) and it is driven by a headless browser, [PhantomJS](http://phantomjs.org/).
 
@@ -18,17 +18,21 @@ Users are stored into [MongoDB](http://www.mongodb.org/) and it is driven by a h
 ## Usage
 
 + Ensure ```mongod``` database is running
-+ Start the script e.g. ```node test/index.js```
++ Start the script e.g. ```node example/index.js```
 
 ```
+var Pymk = require('../index');
+
 var options = {
-    email: 'yo@myemail.com',
-    password: 'supersecret',
-    maxTimesVisit: 3, // Maximum number of times to visit someone’s profile
-    timeBetweenVists: 60 * 60 * 24 * 10 // Duration between next viewing someone’s profile
+    email: 'example@mail.com',
+    password: 'topSecret',
+    maxTimesToVisit: 3,
+    timeBetweenVists: 60 * 60 * 24 * 10,
+    numberOfPages: 4
 };
 
-pymk(options);
+var pymk = new Pymk(options);
+pymk.run();
 ```
 
 ## License
